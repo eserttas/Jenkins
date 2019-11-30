@@ -5,11 +5,10 @@ try{
     def mvnCMD = "${mvnHome}/bin/mvn"
         
     stage('SCM Checkout'){
-        notifyBuild('STARTED')
         sh "rm -f .git/config.lock"
         sh "echo ${user_name}"
         
-        git branch: 'development', credentialsId: 'git-creds-elif', url: 'https://github.com/eserttas/todolist.git'
+        git branch: 'master', credentialsId: 'git-creds-elif', url: 'https://github.com/eserttas/todolist.git'
      
    
         
