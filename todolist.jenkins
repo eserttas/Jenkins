@@ -1,0 +1,64 @@
+try{
+    
+    node('localmachine'){
+    def mvnHome = tool name: 'maven', type: 'maven'
+    def mvnCMD = "${mvnHome}/bin/mvn"
+        
+    stage('SCM Checkout'){
+        notifyBuild('STARTED')
+        sh "rm -f .git/config.lock"
+        sh "echo ${user_name}"
+        
+        git branch: 'development', credentialsId: 'git-creds-elif', url: 'https://github.com/eserttas/todolist.git'
+     
+   
+        
+        
+    }
+    stage ('Mvn Clean'){
+        sh "${mvnCMD} clean"
+        //sh "${mvnCMD} install -DskipTests"
+
+    }
+    
+      stage ('Test Case & Maven Install'){
+        sh "${mvnCMD} install"
+    }
+    
+   
+    stage ('Docker Build image '){
+          sh "pwd"
+          sh "sudo docker stop \$(docker container ls -a -fname=todolist-novul -q)"
+          try{
+              sh "sudo docker rmi -f \$(docker images  | grep todolist-novul)"; 
+          }catch(ex){
+              
+          }
+         
+          try{
+             sh "sudo docker build -t docker-spring-boot-todolist-novul ." 
+          }catch(ex){
+              
+          }
+          
+    }
+    
+    stage ('Docker Container Up'){
+            sh 'docker ps -f name=todolist-novul -q | xargs --no-run-if-empty docker container stop'
+            sh 'docker container ls -a -fname=todolist-novul -q | xargs -r docker container rm'
+            sh "sudo docker run -d --name=todolist-novul  -p 80:8080 docker-spring-boot-todolist-novul"
+         sh "rm -f .git/config.lock"
+    }
+    
+  
+    
+}
+    
+}catch(e){
+    
+    throw e
+}
+
+
+
+}
