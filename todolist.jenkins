@@ -27,7 +27,12 @@ try{
    
     stage ('Docker Build image '){
           sh "pwd"
-          sh "sudo docker stop \$(docker container ls -a -fname=todolist-novul -q)"
+		  try{
+			sh "sudo docker stop \$(docker container ls -a -fname=todolist-novul -q)"
+		  }catch(ex){
+		  
+		  }
+		  
           try{
               sh "sudo docker rmi -f \$(docker images  | grep todolist-novul)"; 
           }catch(ex){
